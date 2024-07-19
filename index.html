@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>きみの掲示板</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        #post-form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        #post-form input, #post-form textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+        }
+        #post-form button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        #posts {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .post {
+            border-bottom: 1px solid #ddd;
+            padding: 10px 0;
+        }
+        .post:last-child {
+            border-bottom: none;
+        }
+        #board-links {
+            margin-top: 20px;
+            text-align: center;
+        }
+        #board-links a {
+            margin: 0 10px;
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <h1>きみの掲示板</h1>
+    <div id="post-form">
+        <input type="text" id="nickname" placeholder="ニックネーム" maxlength="20">
+        <textarea id="message" placeholder="メッセージ (200文字以内)" maxlength="200"></textarea>
+        <button onclick="postMessage()">投稿</button>
+    </div>
+    <div id="posts"></div>
+    <div id="board-links">
+        <a href="#" onclick="changeBoard(-1)">前の掲示板</a>
+        <span id="current-board">きみの掲示板 1</span>
+        <a href="#" onclick="changeBoard(1)">次の掲示板</a>
+    </div>
+
+    <script>
+        let currentBoard = 1;
+        let posts = [];
+        let savedNickname = '';
+
+        function postMessage() {
+            const nicknameInput = document.getElementById('nickname');
+            const message = document.getElementById('message').value;
+            
+            // ニックネームが変更されたか、まだ保存されていない場合は更新
+            if (nicknameInput.value && nicknameInput.value !== savedNickname) {
+                savedNickname = nicknameInput.value;
+            }
+
+            if (savedNickname && message) {
+                posts.push({ nickname: savedNickname, message });
+                updatePosts();
+                document.getElementById('message').value = '';
+
+                if (posts.length >= 100) {
+                    currentBoard++;
+                    posts = [];
+                    updateBoardInfo();
+                }
+            }
+        }
+
+        function updatePosts() {
+            const postsDiv = document.getElementById('posts');
+            postsDiv.innerHTML = '';
+            posts.forEach(post => {
+                const postElement = document.createElement('div');
+                postElement.className = 'post';
+                postElement.innerHTML = `<strong>${post.nickname}</strong>: ${post.message}`;
+                postsDiv.appendChild(postElement);
+            });
+        }
+
+        function updateBoardInfo() {
+            document.getElementById('current-board').textContent = `きみの掲示板 ${currentBoard}`;
+        }
+
+        function changeBoard(direction) {
+            currentBoard += direction;
+            if (currentBoard < 1) currentBoard = 1;
+            updateBoardInfo();
+            // ここで、実際のアプリケーションではサーバーから新しい掲示板のデータを取得します
+            posts = []; // デモ用に投稿をクリア
+            updatePosts();
+        }
+
+        updateBoardInfo();
+    </script>
+</body>
+</html>
