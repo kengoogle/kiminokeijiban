@@ -41,6 +41,8 @@
             background-color: #fff;
             padding: 20px;
             border-radius: 5px;
+            height: 400px;
+            overflow-y: auto;
         }
         .post {
             border-bottom: 1px solid #ddd;
@@ -78,17 +80,25 @@
         let posts = [];
         let savedNickname = '';
 
+        // 疑似サーバーのメッセージ配列
+        let serverMessages = [
+            { nickname: "田中さん", message: "こんにちは！" },
+            { nickname: "佐藤さん", message: "今日はいい天気ですね。" },
+            { nickname: "鈴木さん", message: "新しい店ができたらしいですよ。" }
+        ];
+
         function postMessage() {
             const nicknameInput = document.getElementById('nickname');
             const message = document.getElementById('message').value;
             
-            // ニックネームが変更されたか、まだ保存されていない場合は更新
             if (nicknameInput.value && nicknameInput.value !== savedNickname) {
                 savedNickname = nicknameInput.value;
             }
 
             if (savedNickname && message) {
-                posts.push({ nickname: savedNickname, message });
+                const newPost = { nickname: savedNickname, message };
+                posts.push(newPost);
+                serverMessages.push(newPost);  // サーバーにも追加
                 updatePosts();
                 document.getElementById('message').value = '';
 
@@ -109,6 +119,7 @@
                 postElement.innerHTML = `<strong>${post.nickname}</strong>: ${post.message}`;
                 postsDiv.appendChild(postElement);
             });
+            postsDiv.scrollTop = postsDiv.scrollHeight;
         }
 
         function updateBoardInfo() {
@@ -119,12 +130,45 @@
             currentBoard += direction;
             if (currentBoard < 1) currentBoard = 1;
             updateBoardInfo();
-            // ここで、実際のアプリケーションではサーバーから新しい掲示板のデータを取得します
             posts = []; // デモ用に投稿をクリア
             updatePosts();
         }
 
+        // 疑似リアルタイム更新
+        function checkForNewMessages() {
+            if (serverMessages.length > posts.length) {
+                const newMessages = serverMessages.slice(posts.length);
+                posts = posts.concat(newMessages);
+                updatePosts();
+            }
+        }
+
+        // 5秒ごとに新しいメッセージをチェック
+        setInterval(checkForNewMessages, 5000);
+
+        // 初期表示
         updateBoardInfo();
+        updatePosts();
+
+        // デモ用：ランダムに新しいメッセージを追加
+        setInterval(() => {
+            const randomMessages = [
+                "こんにちは！",
+                "今日の天気はどうですか？",
+                "新しい情報ありますか？",
+                "みなさん、元気ですか？",
+                "良い一日を！"
+            ];
+            const randomNicknames = ["匿名さん", "通りすがりさん", "村人A", "隣の人", "知らない人"];
+            
+            if (Math.random() < 0.3) {  // 30%の確率で新しいメッセージを追加
+                const newMessage = {
+                    nickname: randomNicknames[Math.floor(Math.random() * randomNicknames.length)],
+                    message: randomMessages[Math.floor(Math.random() * randomMessages.length)]
+                };
+                serverMessages.push(newMessage);
+            }
+        }, 10000);  // 10秒ごとに実行
     </script>
 </body>
 </html>
