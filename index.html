@@ -80,9 +80,6 @@
         let posts = [];
         let savedNickname = '';
 
-        // 疑似サーバーのメッセージ配列
-        let serverMessages = [];
-
         function postMessage() {
             const nicknameInput = document.getElementById('nickname');
             const message = document.getElementById('message').value;
@@ -93,12 +90,13 @@
 
             if (savedNickname && message) {
                 const newPost = { nickname: savedNickname, message, timestamp: Date.now() };
-                serverMessages.push(newPost);
+                posts.push(newPost);
                 document.getElementById('message').value = '';
+                updatePosts();
 
-                if (serverMessages.length > 100) {
+                if (posts.length > 100) {
                     currentBoard++;
-                    serverMessages = serverMessages.slice(-100);
+                    posts = posts.slice(-100);
                     updateBoardInfo();
                 }
             }
@@ -107,7 +105,7 @@
         function updatePosts() {
             const postsDiv = document.getElementById('posts');
             postsDiv.innerHTML = '';
-            serverMessages.forEach(post => {
+            posts.forEach(post => {
                 const postElement = document.createElement('div');
                 postElement.className = 'post';
                 postElement.innerHTML = `<strong>${post.nickname}</strong>: ${post.message}`;
@@ -124,57 +122,13 @@
             currentBoard += direction;
             if (currentBoard < 1) currentBoard = 1;
             updateBoardInfo();
-            serverMessages = []; // 新しい掲示板に移動
+            posts = []; // 新しい掲示板に移動
             updatePosts();
         }
-
-        // より頻繁に更新をチェック（500ミリ秒ごと）
-        setInterval(updatePosts, 500);
 
         // 初期表示
         updateBoardInfo();
         updatePosts();
-
-        // 多様な投稿をシミュレート
-        const simulatePost = () => {
-            const randomMessages = [
-                "こんにちは！",
-                "今日の天気はどうですか？",
-                "新しい情報ありますか？",
-                "みなさん、元気ですか？",
-                "良い一日を！",
-                "近所で面白いイベントがあるそうです。",
-                "新しいお店ができたらしいですよ。",
-                "今日の夕飯は何にしようかな？",
-                "誰か映画の推薦をしてください。",
-                "最近、趣味で絵を描き始めました。",
-                "地域の清掃活動に参加しませんか？",
-                "健康のために散歩を始めました。",
-                "みんなの好きな季節は？",
-                "おすすめの本があれば教えてください。",
-                "地域の伝統行事について詳しい方いますか？"
-            ];
-            const randomNicknames = ["匿名さん", "通りすがりさん", "村人A", "隣の人", "知らない人", "町内会長", "学生さん", "主婦の方", "サラリーマン", "お年寄り", "若者", "先生", "お医者さん", "農家の方", "地域ボランティア"];
-            
-            const newMessage = {
-                nickname: randomNicknames[Math.floor(Math.random() * randomNicknames.length)],
-                message: randomMessages[Math.floor(Math.random() * randomMessages.length)],
-                timestamp: Date.now()
-            };
-            serverMessages.push(newMessage);
-
-            if (serverMessages.length > 100) {
-                currentBoard++;
-                serverMessages = serverMessages.slice(-100);
-                updateBoardInfo();
-            }
-
-            // 次の投稿までの時間をランダムに設定（0.5秒から5秒の間）
-            setTimeout(simulatePost, Math.random() * 4500 + 500);
-        };
-
-        // シミュレーションを開始
-        simulatePost();
     </script>
 </body>
 </html>
